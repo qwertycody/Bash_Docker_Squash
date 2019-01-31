@@ -177,8 +177,8 @@ main()
     echo "Importing New Image..."
 	importImage "false"
 
-    #echo "Cleaning up..."
-	#cleanUp
+    echo "Cleaning up..."
+	cleanUp
 }
 
 main
