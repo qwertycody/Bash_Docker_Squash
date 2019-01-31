@@ -126,13 +126,14 @@ buildImage()
 	echo "Dynamic Docker File located at $DYNAMIC_DOCKER_FILE_PATH"
 
     #Get the image the container is based on
-    getDockerInspectionValues $CONTAINER ".Image" "FROM " >> "$DYNAMIC_DOCKER_FILE_PATH"
+    CONTAINER_IMAGE_ID=$(getDockerInspectionValues $CONTAINER ".Image" "")
     
-    getDockerInspectionValues $IMAGE_TO_BUILD_RAW ".Config.User" "USER " >> "$DYNAMIC_DOCKER_FILE_PATH"
-    getDockerInspectionValues $IMAGE_TO_BUILD_RAW ".Config.Env" "ENV " >> "$DYNAMIC_DOCKER_FILE_PATH"
-    getDockerInspectionValues $IMAGE_TO_BUILD_RAW ".Config.WorkingDir" "WORKDIR " >> "$DYNAMIC_DOCKER_FILE_PATH"
-    getDockerInspectionValues_Healthcheck $IMAGE_TO_BUILD_RAW >> "$DYNAMIC_DOCKER_FILE_PATH"
-    getDockerInspectionValues_AsJson $IMAGE_TO_BUILD_RAW ".Config.Cmd" "CMD " >> "$DYNAMIC_DOCKER_FILE_PATH"
+    echo "FROM $CONTAINER_IMAGE_ID" >> "$DYNAMIC_DOCKER_FILE_PATH"
+    getDockerInspectionValues $CONTAINER_IMAGE_ID ".Config.User" "USER " >> "$DYNAMIC_DOCKER_FILE_PATH"
+    getDockerInspectionValues $CONTAINER_IMAGE_ID ".Config.Env" "ENV " >> "$DYNAMIC_DOCKER_FILE_PATH"
+    getDockerInspectionValues $CONTAINER_IMAGE_ID ".Config.WorkingDir" "WORKDIR " >> "$DYNAMIC_DOCKER_FILE_PATH"
+    getDockerInspectionValues_Healthcheck $CONTAINER_IMAGE_ID >> "$DYNAMIC_DOCKER_FILE_PATH"
+    getDockerInspectionValues_AsJson $CONTAINER_IMAGE_ID ".Config.Cmd" "CMD " >> "$DYNAMIC_DOCKER_FILE_PATH"
 
 	$DOCKER build . --file "$DYNAMIC_DOCKER_FILE_PATH" --tag $IMAGE_TO_BUILD
 }
@@ -158,6 +159,7 @@ cleanUp()
     rm -f $DYNAMIC_DOCKER_FILE_PATH
     rm -f $CONTAINER_EXPORT_PATH
     rm -f $IMAGE_EXPORT_PATH
+    docker image prune
 }
 
 main()
