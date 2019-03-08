@@ -2,7 +2,7 @@
 DOCKER="docker"
 
 #Docker Repository to Associate Final Image with
-REPOSITORY="repositoryBro"
+REPOSITORY="repositorybro"
 
 #Current Container Name that is being used
 TAG=$(basename "$0" .sh)
