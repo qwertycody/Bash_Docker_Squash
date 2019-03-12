@@ -1,12 +1,14 @@
 #Docker Command
 DOCKER="docker"
 
+#Current Container Name that is being used to Squash into a Final Image
+CONTAINER=$(basename "$0" .sh)
+
 #Docker Repository to Associate Final Image with
 REPOSITORY="repository"
 
-#Current Container Name that is being used
-CONTAINER=$(basename "$0" .sh)
-TAG=$CONTAINER 
+#Docker Tag to Associate Final Image with
+TAG="$CONTAINER"
 
 #Final Image Name after work is done
 IMAGE_TO_BUILD="$REPOSITORY:$TAG"
@@ -107,7 +109,7 @@ getDockerInspectionValues_Healthcheck()
 
 exportContainer()
 {
-	$DOCKER export --output $CONTAINER_EXPORT_PATH $TAG
+	$DOCKER export --output $CONTAINER_EXPORT_PATH $CONTAINER
 }
 
 importRawImage()
@@ -140,11 +142,15 @@ buildImage()
 	DOCKER_BUILD_CONTEXT_FOLDER=$(mktemp -d --tmpdir="$TEMP_DIRECTORY")
 
 	$DOCKER build $DOCKER_BUILD_CONTEXT_FOLDER --compress --file "$DYNAMIC_DOCKER_FILE_PATH" --tag $IMAGE_TO_BUILD
+	
+	#Save Dat HD Space
+	$DOCKER rmi $IMAGE_TO_BUILD_RAW
 }
 
 exportImage()
 {
 	$DOCKER save --output $IMAGE_EXPORT_PATH $IMAGE_TO_BUILD
+	$DOCKER rmi $IMAGE_TO_BUILD
 }
 
 importImage()
@@ -181,7 +187,7 @@ main()
 	exportImage
 
     echo "Importing New Image..."
-	importImage "false"
+	importImage "true"
 
     echo "Cleaning up..."
 	cleanUp
