@@ -2,26 +2,28 @@
 DOCKER="docker"
 
 #Docker Repository to Associate Final Image with
-REPOSITORY="repositorybro"
+REPOSITORY="repository"
 
 #Current Container Name that is being used
-TAG=$(basename "$0" .sh)
-CONTAINER=$TAG 
+CONTAINER=$(basename "$0" .sh)
+TAG=$CONTAINER 
 
 #Final Image Name after work is done
 IMAGE_TO_BUILD="$REPOSITORY:$TAG"
+
+TEMP_DIRECTORY="/opt/"
 
 #Intermediary Image Name for Raw, Flattened Container Filesystem Export
 IMAGE_TO_BUILD_RAW=${IMAGE_TO_BUILD}_raw
 
 #Dynamic Dockerfile that Contains Image Configuration
-DYNAMIC_DOCKER_FILE_PATH=$(mktemp)
+DYNAMIC_DOCKER_FILE_PATH=$(mktemp --tmpdir="$TEMP_DIRECTORY")
 
 #Container Filesystem that is flattened but does not have Docker configurations attached
-CONTAINER_EXPORT_PATH=$(mktemp)
+CONTAINER_EXPORT_PATH=$(mktemp --tmpdir="$TEMP_DIRECTORY")
 
 #Image Export that Contains the Container Filesystem and the generated Dockerfile Configurations
-IMAGE_EXPORT_PATH=$(mktemp)
+IMAGE_EXPORT_PATH=$(mktemp --tmpdir="$TEMP_DIRECTORY")
 
 outputArray()
 {
@@ -134,8 +136,10 @@ buildImage()
     getDockerInspectionValues $CONTAINER_IMAGE_ID ".Config.WorkingDir" "WORKDIR " >> "$DYNAMIC_DOCKER_FILE_PATH"
     getDockerInspectionValues_Healthcheck $CONTAINER_IMAGE_ID >> "$DYNAMIC_DOCKER_FILE_PATH"
     getDockerInspectionValues_AsJson $CONTAINER_IMAGE_ID ".Config.Cmd" "CMD " >> "$DYNAMIC_DOCKER_FILE_PATH"
+	
+	DOCKER_BUILD_CONTEXT_FOLDER=$(mktemp -d --tmpdir="$TEMP_DIRECTORY")
 
-	$DOCKER build . --file "$DYNAMIC_DOCKER_FILE_PATH" --tag $IMAGE_TO_BUILD
+	$DOCKER build $DOCKER_BUILD_CONTEXT_FOLDER --compress --file "$DYNAMIC_DOCKER_FILE_PATH" --tag $IMAGE_TO_BUILD
 }
 
 exportImage()
