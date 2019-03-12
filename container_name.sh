@@ -150,18 +150,6 @@ buildImage()
 exportImage()
 {
 	$DOCKER save --output $IMAGE_EXPORT_PATH $IMAGE_TO_BUILD
-	$DOCKER rmi $IMAGE_TO_BUILD
-}
-
-importImage()
-{
-	DELETE_FILE_AFTER=$1
-
-	$DOCKER load --input $IMAGE_EXPORT_PATH
-
-    if [ "$DELETE_FILE_AFTER" == "true" ]; then
-        rm -f "$IMAGE_EXPORT_PATH"
-    fi
 }
 
 cleanUp()
@@ -183,11 +171,8 @@ main()
     echo "Building New Image..."
 	buildImage
 
-    echo "Exporting New Image..."
-	exportImage
-
-    echo "Importing New Image..."
-	importImage "true"
+    #echo "Exporting New Image..."
+	#exportImage
 
     echo "Cleaning up..."
 	cleanUp
