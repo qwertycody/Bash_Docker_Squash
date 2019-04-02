@@ -132,7 +132,7 @@ buildImage()
     #Get the image the container is based on
     CONTAINER_IMAGE_ID=$(getDockerInspectionValues $CONTAINER ".Image" "")
     
-    echo "FROM $CONTAINER_IMAGE_ID" >> "$DYNAMIC_DOCKER_FILE_PATH"
+    echo "FROM $IMAGE_TO_BUILD_RAW" >> "$DYNAMIC_DOCKER_FILE_PATH"
     getDockerInspectionValues $CONTAINER_IMAGE_ID ".Config.User" "USER " >> "$DYNAMIC_DOCKER_FILE_PATH"
     getDockerInspectionValues $CONTAINER_IMAGE_ID ".Config.Env" "ENV " >> "$DYNAMIC_DOCKER_FILE_PATH"
     getDockerInspectionValues $CONTAINER_IMAGE_ID ".Config.WorkingDir" "WORKDIR " >> "$DYNAMIC_DOCKER_FILE_PATH"
@@ -157,7 +157,9 @@ cleanUp()
     rm -f $DYNAMIC_DOCKER_FILE_PATH
     rm -f $CONTAINER_EXPORT_PATH
     rm -f $IMAGE_EXPORT_PATH
-    docker image prune
+    docker image prune --force
+    docker volume prune --force
+    docker network prune --force
 }
 
 main()
