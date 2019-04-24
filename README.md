@@ -27,10 +27,11 @@ Features
 Usage
 --------
 
-1. Download the container_name.sh bash script
-2. Rename the file to the name of the container to squash
-3. (Optional) Open the script and edit the name of the final repository of the squashed image (Line 5)
-4. Run the Script
+1. Download the squash.sh bash script
+2. Before running make sure you have at least 2-3 times the size freespace on the HD of the image you are trying to squash
+3. In GitBash/Cygwin or Linux do "sh squash.sh"
+4. Wait a bit
+5. Delete Container and Create new container based off new base image - maybe do house keeping on old images
 
 Troubleshooting
 --------
