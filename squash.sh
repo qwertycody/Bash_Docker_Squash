@@ -126,18 +126,7 @@ getDockerInspectionValues_Healthcheck()
 
 exportContainer()
 {
-	$DOCKER export --output $CONTAINER_EXPORT_PATH $CONTAINER
-}
-
-importRawImage()
-{
-	DELETE_FILE_AFTER=$1
-    
-    $DOCKER import "$CONTAINER_EXPORT_PATH" $IMAGE_TO_BUILD_RAW
-
-    if [ "$DELETE_FILE_AFTER" == "true" ]; then
-        rm -f "$CONTAINER_EXPORT_PATH"
-    fi
+	$DOCKER export $CONTAINER | $DOCKER import - $IMAGE_TO_BUILD_RAW
 }
 
 buildImage()
@@ -181,11 +170,8 @@ cleanUp()
 
 main()
 {
-    echo "Exporting Container..."
+    echo "Exporting Container and Importing Raw..."
 	exportContainer 
-
-    echo "Importing Raw Image..."
-	importRawImage "true"
 
     echo "Building New Image..."
 	buildImage
